@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import { Animated, Easing, View, NativeModules, Modal, StatusBar, Platform } from 'react-native';
 import Tooltip from './Tooltip';
 import SvgMask from './SvgMask';
 import ViewMask from './ViewMask';
 import StepNumber from './StepNumber';
 import styles, { MARGIN, ARROW_SIZE, STEP_NUMBER_DIAMETER, STEP_NUMBER_RADIUS } from './style';
+
+var isWeb = Platform.OS === 'web';
 
 const noop = () => {};
 
@@ -152,8 +155,8 @@ class CopilotModal extends Component {
       layout,
       animated: this.props.animated,
       size: {
-        x: obj.width,
-        y: obj.height,
+        x: obj.width - (isWeb ? 2 : 0),
+        y: obj.height - (isWeb ? 2 : 0),
       },
       position: {
         x: Math.floor(Math.max(obj.left, 0)),
@@ -274,13 +277,15 @@ class CopilotModal extends Component {
     const containerVisible = this.state.containerVisible || this.props.visible;
     const contentVisible = this.state.layout && containerVisible;
 
-    return containerVisible ? (
+    if (!containerVisible) return null;
+
+    var modal = (
       <Modal
         animationType="none"
         visible={containerVisible}
         onRequestClose={noop}
         transparent
-        style={{height: '100%', width: '100%', position: 'fixed', top: 0, left: 0}}
+        style={{height: '100%', width: '100%', position: 'fixed', top: 0, left: 0, borderColor: 'none'}}
         supportedOrientations={['portrait', 'landscape']}
       >
         <View
@@ -291,7 +296,10 @@ class CopilotModal extends Component {
           {contentVisible && this.renderTooltip()}
         </View>
       </Modal>
-    ) : null;
+    );
+
+    if (isWeb) return ReactDOM.createPortal(modal, document.getElementById('root'));
+    else return modal;
   }
 }
 

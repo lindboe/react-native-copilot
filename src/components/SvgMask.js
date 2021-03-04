@@ -7,7 +7,8 @@ import {
   Easing,
   Dimensions,
   I18nManager,
-  TouchableOpacity
+  TouchableOpacity,
+  Platform
 } from 'react-native';
 import Svg from 'react-native-svg';
 import AnimatedSvgPath from './AnimatedPath';
@@ -52,14 +53,20 @@ class SvgMask extends Component {
   }
 
   animationListener = () => {
-    const d = this.props.svgMaskPath({
-      size: this.state.size,
-      position: this.state.position,
-      canvasSize: this.state.canvasSize,
-      step: this.props.currentStep,
-    });
     if (this.mask) {
-      this.mask.setNativeProps({ d });
+      const d = this.props.svgMaskPath({
+        size: this.state.size,
+        position: this.state.position,
+        canvasSize: this.state.canvasSize,
+        step: this.props.currentStep,
+      });
+
+      if (Platform.OS === 'web') {
+        this.mask.setAttribute('d', d);
+      }
+      else {
+        this.mask.setNativeProps({ d });
+      }
     }
   };
 
@@ -108,7 +115,7 @@ class SvgMask extends Component {
             ? (
               <Svg pointerEvents="none" width={this.state.canvasSize.x} height={this.state.canvasSize.y}>
                 <AnimatedSvgPath
-                  ref={(ref) => { this.mask = ref; }}
+                  ref={(ref) => this.mask = ref}
                   fill={this.props.backdropColor}
                   fillRule="evenodd"
                   strokeWidth={1}
