@@ -1,6 +1,6 @@
 {
   "name": "@symbolic/react-native-copilot",
-  "version": "2.6.5",
+  "version": "2.6.6",
   "description": "Make an interactive step by step tour guide for you react-native app",
   "main": "dist/index.js",
   "private": false,
